@@ -1,16 +1,14 @@
 import React from 'react'
-import { Button, Icon, Label } from 'semantic-ui-react'
+import { Feed, Icon } from 'semantic-ui-react'
 
 const VoteScore = (props) => (
-  <div>
-    <Button as='div' labelPosition='right'>
-      <Button color='red'>
-        <Icon name='heart' />
-        Like
-      </Button>
-      <Label as='a' basic color='red' pointing='left'>{props.score}</Label>
-    </Button>
-  </div>
+  <Feed.Like onClick={(e) => {
+    e.currentTarget.classList.toggle('active')
+    props.handleVoteScore(e.currentTarget.classList.contains('active'))
+}}>
+    <Icon name='like' />
+    {props.score} Likes
+</Feed.Like>
 )
 
 export default VoteScore

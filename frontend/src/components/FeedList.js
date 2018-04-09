@@ -1,5 +1,6 @@
 import React from 'react'
 import { Feed, Icon, Label } from 'semantic-ui-react'
+import VoteScore from '../components/VoteScore';
 import Moment from 'react-moment'
 import 'moment-timezone'
 import { hexToReverse, strToHex } from '../utils/colorHelpers';
@@ -25,13 +26,9 @@ const FeedList = (props) => (
                                 {post.body}
                             </Feed.Extra>
                             <Feed.Meta>
-                                <Feed.Like onClick={(e) => {
-                                    e.currentTarget.classList.toggle('active')
-                                    props.handleFeedLike(post.id, e.currentTarget.classList.contains('active'))
-                                }}>
-                                    <Icon name='like' />
-                                    {post.voteScore} Likes
-                            </Feed.Like>
+                                <VoteScore score={post.voteScore} handleVoteScore={(isLike) => {
+                                    props.handleFeedLike(post.id, isLike)
+                                }}/>
                             </Feed.Meta>
                         </Feed.Content>
                     </Feed.Event>

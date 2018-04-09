@@ -8,6 +8,7 @@ import reducer from './reducers/index.js';
 import { Provider } from 'react-redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
+import { BrowserRouter } from 'react-router-dom';
 
 const middleware = [ thunk ]
 if ( process.env.NODE_ENV !== 'production' ) {
@@ -24,8 +25,10 @@ const store = createStore(
 )
 
 ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
+    <BrowserRouter>
+        <Provider store={store}>
+            <App />
+        </Provider>
+    </BrowserRouter>,
     document.getElementById('root'));
 registerServiceWorker();

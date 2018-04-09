@@ -14,6 +14,17 @@ const defaultData = {
     deleted: false,
     commentCount: 2
   },
+  "8xf0y6ziyjabvozdd253nc": {
+    id: '8xf0y6ziyjabvozdd253nc',
+    timestamp: 1467166872634,
+    title: 'Udacity is the best placeaaa',
+    body: 'adsfadsfadf',
+    author: 'thingtwo',
+    category: 'react',
+    voteScore: 2,
+    deleted: false,
+    commentCount: 2
+  },
   "6ni6ok3ym7mf1p33lnez": {
     id: '6ni6ok3ym7mf1p33lnez',
     timestamp: 1468479767190,

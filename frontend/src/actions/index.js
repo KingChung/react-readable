@@ -21,6 +21,7 @@ export const requestCategories = () => (dispatch) => {
 export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const FRESH_POST = 'FRESH_POST'
+export const SORT_POSTS = 'SORT_POSTS'
 
 const fetchPosts = (category) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/${category}/posts`, {
@@ -46,6 +47,11 @@ const updatePost = (postId, params) => (dispatch) => {
 export const receivePosts = (posts) => ({
     type: RECEIVE_POSTS,
     posts
+})
+
+export const sortPosts = (criteria) => ({
+    type: SORT_POSTS,
+    criteria
 })
 
 export const freshPost = (post) => ({

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import TabMenu from '../../components/TabMenu'
-import { REQUEST_CATEGORIES, requestCategories, requestPosts } from '../../actions';
+import { requestCategories, requestPosts, votePost } from '../../actions';
 import { connect } from 'react-redux';
 import { Tab } from 'semantic-ui-react';
 import FeedList from '../../components/FeedList';
@@ -36,7 +36,9 @@ class App extends Component {
       })
     })
   }
-  fetch
+  handlePostLike = (postId, isLike) => {
+    this.props.votePost(postId, isLike)
+  }
   render() {
     const { isLoading, isEmpty } = this.state
     return (
@@ -45,7 +47,7 @@ class App extends Component {
         <Tab.Pane loading={ isLoading ? true : false }>
           {isEmpty
             ? <div>No Feeds.</div>
-            : <FeedList posts={this.props.posts} />
+            : <FeedList posts={this.props.posts} handleFeedLike={this.handlePostLike}/>
           }
         </Tab.Pane>
       </div>
@@ -64,5 +66,6 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   requestCategories,
-  requestPosts
+  requestPosts,
+  votePost
 })(App);

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Feed, Icon, Label } from 'semantic-ui-react'
+import { Feed, Label } from 'semantic-ui-react'
 import VoteScore from '../components/VoteScore';
 import Moment from 'react-moment'
 import 'moment-timezone'

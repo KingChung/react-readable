@@ -10,6 +10,7 @@ import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { BrowserRouter } from 'react-router-dom';
 
+
 const middleware = [ thunk ]
 if ( process.env.NODE_ENV !== 'production' ) {
     middleware.push(createLogger())

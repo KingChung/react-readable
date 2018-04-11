@@ -7,7 +7,6 @@ import { withRouter } from 'react-router-dom';
 class GlobalMenu extends Component {
   componentDidMount() {
     this.props.dispatch(requestCategories())
-    console.log(this.props.activeItem);
     this.selectMenu(this.props.activeItem)
   }
   handleItemClick = (e, { name, path }) => {
@@ -37,7 +36,7 @@ const mapStateToProps = (state) => {
   const { globalMenu, categories } = state
   return {
     globalMenu,
-    menuItems: [{ name: 'home', path: '' }].concat(categories.map((cate) => {
+    menuItems: [{ name: 'all', path: '' }].concat(categories.map((cate) => {
       const { name } = cate
       return { name, path: name }
     })),

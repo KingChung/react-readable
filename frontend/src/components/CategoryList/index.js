@@ -1,43 +1,35 @@
 import React, { Component } from 'react'
 import { Segment } from 'semantic-ui-react'
 import FeedList from '../FeedList'
-import { fetchPosts, votePost } from '../../utils/apiHelper';
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux';
 import GlobalMenu from '../../components/GlobalMenu';
+import { requestPosts, votePost } from '../../actions';
 
 class CategoryList extends Component {
   state = {
     isLoading: false,
-    isEmpty: true,
-    posts: []
+    isEmpty: true
   }
   componentDidMount() {
-    this.handleFetchPosts(this.props.category)
+    this.handleFetchPost(this.props.category)
   }
   componentWillReceiveProps(nextProps) {
-    this.handleFetchPosts(nextProps.category)
+    if(this.props.category !== nextProps.category) {
+      this.handleFetchPost(nextProps.category)
+    }
   }
-  handleFetchPosts(category) {
-    this.setState({ isLoading: true, isEmpty: true })
-    fetchPosts(category).then((posts) => {
+  handleFetchPost(category) {
+    this.setState({isLoading: true})
+    this.props.dispatch(requestPosts(category)).then(() => {
       this.setState({
         isLoading: false,
-        isEmpty: ! posts.length,
-        posts
+        isEmpty: !this.props.posts.length
       })
     })
   }
   handlePostLike = (postId, isLike) => {
-    const { posts } = this.state
-    votePost(postId, isLike).then((post) => {
-      this.setState({
-        posts: posts.reduce((posts, oldPost) => {
-          posts.push(oldPost.id === post.id ? Object.assign(oldPost, post) : oldPost)
-          return posts
-      }, [])
-      })
-    })
+    this.props.dispatch(votePost(postId, isLike))
   }
   handleSorter = (e) => {
     const criteria = e.target.value
@@ -53,13 +45,14 @@ class CategoryList extends Component {
   }
   render() {
     const { isLoading, isEmpty } = this.state
+    const { category, posts } = this.props
     return (
         <div>
-          <GlobalMenu activeItem={this.props.category} />
+          <GlobalMenu activeItem={category} />
           <Segment loading={isLoading ? true : false}>
               {isEmpty
               ? <div>No Feeds.</div>
-              : <FeedList posts={this.state.posts} handleFeedLike={this.handlePostLike} />
+              : <FeedList posts={posts} handleFeedLike={this.handlePostLike} />
               }
           </Segment>
         </div>
@@ -67,4 +60,14 @@ class CategoryList extends Component {
   }
 }
 
-export default withRouter(connect()(CategoryList))
+const mapStateToProps = (state) => {
+    const { posts, scoreState } = state
+    return {
+        posts: Object.values(posts).map((post) => ({
+          ...post,
+          isLiked: scoreState[post.id]
+        }))
+    }
+}
+
+export default withRouter(connect(mapStateToProps)(CategoryList))

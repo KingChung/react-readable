@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { Route } from 'react-router-dom';
+import { Route, withRouter, Switch } from 'react-router-dom';
 import CategoryList from '../../components/CategoryList/index';
-import { withRouter } from 'react-router-dom';
+import Post from '../../components/Post/index';
 
 
 class App extends Component {
@@ -12,8 +12,11 @@ class App extends Component {
         <Grid container columns={1}>
           <Grid.Row>
             <Grid.Column>
-              <Route exact path="/" render={({match}) => (<CategoryList category="all" />)} />
-              <Route path="/:category" render={({match}) => (<CategoryList category={match.params.category} />)} />
+              <Switch>
+                <Route exact path="/" render={({ match }) => (<CategoryList category="all" />)} />
+                <Route path="/post/:postId" render={({ match }) => (<Post postId={match.params.postId} />)} />
+                <Route path="/:category" render={({ match }) => (<CategoryList category={match.params.category} />)} />
+              </Switch>
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -23,5 +26,4 @@ class App extends Component {
   }
 }
 
-//@TODO Why should this place use `withRouter`?
 export default withRouter(App)

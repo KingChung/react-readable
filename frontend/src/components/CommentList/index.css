@@ -1,0 +1,7 @@
+
+.comment .content .actions a.like:hover {
+    color: rgba(0,0,0,.95);
+}
+.comment .content .actions .like:hover .like.icon {
+    color: #ff2733;
+}

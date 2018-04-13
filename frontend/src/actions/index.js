@@ -1,3 +1,5 @@
+import uuidCreator from '../utils/uuidCreator'
+
 export const REQUEST_CATEGORIES = 'REQUEST_CATEGORIES'
 export const RECEIVE_CATEGORIES = 'RECEIVE_CATEGORIES'
 
@@ -85,6 +87,65 @@ export const updateScoreState = (id, scoreState) => ({
     id,
     scoreState
 })
+
+export const RECEIVE_COMMENTS = 'RECEIVE_COMMENTS'
+export const RECEIVE_COMMENT = 'RECEIVE_COMMENT'
+const __requestComments = (postId) => (dispatch) => {
+    return fetch(`http://127.0.0.1:3001/posts/${postId}/comments`, {
+        method: 'GET',
+        headers: { 
+            'Authorization': 'as-guest'
+         }
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receiveComments(json)))
+}
+export const receiveComments = (comments) => ({
+    type: RECEIVE_COMMENTS,
+    comments
+})
+export const receiveComment = (comment) => ({
+    type: RECEIVE_COMMENT,
+    comment
+})
+export const requestComments = (postId) => (dispatch) => {
+    return dispatch(__requestComments(postId))
+}
+
+const __createComment = (comment) => (dispatch) => {
+    comment.parentId = comment.postId
+    return fetch(`http://127.0.0.1:3001/comments`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': 'as-guest',
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({
+            ...comment,
+            timestamp: +new Date(),
+            id: uuidCreator('comment'),
+        })
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receiveComment(json)))
+}
+const __deleteComment = (commentId) => (dispatch) => {
+    return fetch(`http://127.0.0.1:3001/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 
+            'Authorization': 'as-guest',
+            'Content-Type' : 'application/json'
+        }
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receiveComment(json)))
+}
+export const createComment = (comment) => (dispatch) => {
+    return dispatch(__createComment(comment))
+}
+export const deleteComment = (commentId) => (dispatch) => {
+    return dispatch(__deleteComment(commentId))
+}
 
 // UI State
 export const SELECT_MENU = 'SELECT_MENU'

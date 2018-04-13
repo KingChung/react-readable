@@ -14,7 +14,7 @@ class App extends Component {
             <Grid.Column>
               <Switch>
                 <Route exact path="/" render={({ match }) => (<CategoryList category="all" />)} />
-                <Route path="/post/:postId" render={({ match }) => (<Post postId={match.params.postId} />)} />
+                <Route exact path="/:category/:postId" render={({ match }) => (<Post postId={match.params.postId} />)} />
                 <Route path="/:category" render={({ match }) => (<CategoryList category={match.params.category} />)} />
               </Switch>
             </Grid.Column>

@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
-import { Segment } from 'semantic-ui-react'
-import FeedList from '../FeedList'
-import { withRouter } from 'react-router-dom'
+import { Segment, Feed, Label, Icon } from 'semantic-ui-react'
+import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux';
 import GlobalMenu from '../../components/GlobalMenu';
 import { requestPosts, votePost } from '../../actions';
+import './index.css';
+import VoteScore from '../../components/VoteScore';
+import Moment from 'react-moment'
+import 'moment-timezone'
+import { hexToReverse, strToHex } from '../../utils/colorHelpers';
 
 class CategoryList extends Component {
   state = {
@@ -45,14 +49,49 @@ class CategoryList extends Component {
   }
   render() {
     const { isLoading, isEmpty } = this.state
-    const { category, posts } = this.props
+    const { category } = this.props
     return (
         <div>
           <GlobalMenu activeItem={category} />
           <Segment loading={isLoading ? true : false}>
               {isEmpty
               ? <div>No Feeds.</div>
-              : <FeedList posts={posts} handleFeedLike={this.handlePostLike} />
+              : <Feed>
+              {
+                  this.props.posts.map((post, i) => {
+                      const userColor = strToHex(post.author)
+                      return (
+                          <Feed.Event key={i} as="">
+                              <Feed.Label>
+                                  <Label style={{ background: userColor, color: hexToReverse(userColor) }} size="huge" circular>{post.author[0].toUpperCase()}</Label>
+                              </Feed.Label>
+                              <Feed.Content>
+                                  <Feed.Summary>
+                                      <Feed.User>{post.author}</Feed.User> <Link to={`/${post.category}/${post.id}`} className='title'>{post.title}</Link>
+                                      <Feed.Date>
+                                          <Moment fromNow>{new Date(post.timestamp)}</Moment>
+                                      </Feed.Date>
+                                  </Feed.Summary>
+                                  <Feed.Extra text>
+                                      {post.body}
+                                  </Feed.Extra>
+                                  <Feed.Meta>
+                                      <VoteScore isLiked={post.isLiked} score={post.voteScore} handleVoteScore={(isLike) => {
+                                          this.props.handlePostLike(post.id, isLike)
+                                      }}/>
+                                      <Feed.Like as='span'>
+                                          <Link to={`/${post.category}/${post.id}`}>
+                                              <Icon name='comments' color="teal" />
+                                          </Link>
+                                          {post.commentCount} Comments
+                                      </Feed.Like>
+                                  </Feed.Meta>
+                              </Feed.Content>
+                          </Feed.Event>
+                      )
+                  })
+              }
+          </Feed>
               }
           </Segment>
         </div>

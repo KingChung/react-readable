@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Button, Comment, Form, Header, Label, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux';
 import VoteScore from '../../components/VoteScore'
-import { requestComments, createComment, deleteComment } from '../../actions'
+import { requestComments, createComment, deleteComment, voteComment, SCORETYPE_COMMENT } from '../../actions'
 import { hexToReverse, strToHex } from '../../utils/colorHelpers'
 import Moment from 'react-moment'
 import './index.css'
@@ -26,6 +26,9 @@ class CommentList extends Component {
     handleDeleteComment = (commentId) => {
         this.props.dispatch(deleteComment(commentId))
     }
+    handleCommentLike = (commentId, isLike) => {
+        this.props.dispatch(voteComment(commentId, isLike))
+    }
     render() {
         const { comments } = this.props
         return (
@@ -46,7 +49,9 @@ class CommentList extends Component {
                                 </Comment.Metadata>
                                 <Comment.Text>{comment.body}</Comment.Text>
                                 <Comment.Actions>
-                                    <VoteScore isLiked={comment.isLiked} score={comment.voteScore} />
+                                    <VoteScore isLiked={comment.isLiked} score={comment.voteScore} handleVoteScore={(isLike) => {
+                                        this.handleCommentLike(comment.id, isLike)
+                                    }}/>
                                     <Comment.Action className="trash" onClick={(e) => {
                                         this.handleDeleteComment(comment.id)
                                     }}>
@@ -78,7 +83,7 @@ const mapStateToProps = (state) => {
     return {
         comments: Object.values(comments).map((comment) => ({
           ...comment,
-          isLiked: scoreState[comment.id]
+          isLiked: scoreState[SCORETYPE_COMMENT][comment.id]
         }))
     }
 }

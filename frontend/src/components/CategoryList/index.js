@@ -3,7 +3,7 @@ import { Segment, Feed, Label, Icon } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux';
 import GlobalMenu from '../../components/GlobalMenu';
-import { requestPosts, votePost } from '../../actions';
+import { requestPosts, votePost, SCORETYPE_COMMENT } from '../../actions';
 import './index.css';
 import VoteScore from '../../components/VoteScore';
 import Moment from 'react-moment'
@@ -77,7 +77,7 @@ class CategoryList extends Component {
                                   </Feed.Extra>
                                   <Feed.Meta>
                                       <VoteScore isLiked={post.isLiked} score={post.voteScore} handleVoteScore={(isLike) => {
-                                          this.props.handlePostLike(post.id, isLike)
+                                          this.handlePostLike(post.id, isLike)
                                       }}/>
                                       <Feed.Like as='span'>
                                           <Link to={`/${post.category}/${post.id}`}>
@@ -104,7 +104,7 @@ const mapStateToProps = (state) => {
     return {
         posts: Object.values(posts).map((post) => ({
           ...post,
-          isLiked: scoreState[post.id]
+          isLiked: scoreState[SCORETYPE_COMMENT][post.id]
         }))
     }
 }

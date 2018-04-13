@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { RECEIVE_CATEGORIES, SELECT_MENU, RECEIVE_POSTS, UPDATE_POST, UPDATE_SCORE_STATE, RECEIVE_COMMENTS, RECEIVE_COMMENT } from '../actions';
+import { RECEIVE_CATEGORIES, SELECT_MENU, RECEIVE_POSTS, UPDATE_POST, UPDATE_SCORE_STATE, RECEIVE_COMMENTS, RECEIVE_COMMENT, SCORETYPE_POST, SCORETYPE_COMMENT } from '../actions';
 
 const initMenu = {
     activeItem: ''
@@ -75,12 +75,19 @@ const comments = (state = {}, action) => {
     }
 }
 
-const scoreState = (state = {}, action) => {
+const initScoreState = {
+    [SCORETYPE_POST]: {},
+    [SCORETYPE_COMMENT]: {}
+}
+const scoreState = (state = initScoreState, action) => {
     switch (action.type) {
         case UPDATE_SCORE_STATE:
             return {
                 ...state,
-                [action.id]: action.scoreState
+                [action.scoreType]: {
+                    ...state[action.scoreType],
+                    [action.id]: action.scoreState
+                }
             }
         default:
             return state

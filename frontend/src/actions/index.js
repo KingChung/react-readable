@@ -72,22 +72,6 @@ export const requestPost = (id) => (dispatch) => {
     return dispatch(__fetchPost(id))
 }
 
-const VOTEPOST_LIKE = 'upVote'
-const VOTEPOST_UNLIKE = 'downVote'
-export const votePost = (postId, isLike) => (dispatch) => {
-    dispatch(updateScoreState(postId, isLike))
-    return dispatch(__requestPost(postId, {
-        option:isLike ? VOTEPOST_LIKE : VOTEPOST_UNLIKE
-    }))
-}
-
-export const UPDATE_SCORE_STATE = 'UPDATE_SCORE_STATE'
-export const updateScoreState = (id, scoreState) => ({
-    type: UPDATE_SCORE_STATE,
-    id,
-    scoreState
-})
-
 export const RECEIVE_COMMENTS = 'RECEIVE_COMMENTS'
 export const RECEIVE_COMMENT = 'RECEIVE_COMMENT'
 const __requestComments = (postId) => (dispatch) => {
@@ -140,12 +124,53 @@ const __deleteComment = (commentId) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
 }
+const __updateComment = (commentId, params) => (dispatch) => {
+    return fetch(`http://127.0.0.1:3001/comments/${commentId}`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': 'as-guest',
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(params)
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receiveComment(json)))
+}
 export const createComment = (comment) => (dispatch) => {
     return dispatch(__createComment(comment))
 }
 export const deleteComment = (commentId) => (dispatch) => {
     return dispatch(__deleteComment(commentId))
 }
+
+
+//Vote Score
+const VOTE_LIKE = 'upVote'
+const VOTE_UNLIKE = 'downVote'
+export const SCORETYPE_POST = 'post'
+export const SCORETYPE_COMMENT = 'comment'
+
+export const votePost = (postId, isLike) => (dispatch) => {
+    dispatch(updateScoreState(SCORETYPE_POST, postId, isLike))
+    return dispatch(__requestPost(postId, {
+        option:isLike ? VOTE_LIKE : VOTE_UNLIKE
+    }))
+}
+
+export const voteComment = (commentId, isLike) => (dispatch) => {
+    dispatch(updateScoreState(SCORETYPE_COMMENT, commentId, isLike))
+    return dispatch(__updateComment(commentId, {
+        option:isLike ? VOTE_LIKE : VOTE_UNLIKE
+    }))
+}
+
+export const UPDATE_SCORE_STATE = 'UPDATE_SCORE_STATE'
+export const updateScoreState = (scoreType, id, scoreState) => ({
+    type: UPDATE_SCORE_STATE,
+    id,
+    scoreState,
+    scoreType
+})
 
 // UI State
 export const SELECT_MENU = 'SELECT_MENU'

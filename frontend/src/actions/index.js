@@ -23,6 +23,7 @@ export const requestCategories = () => (dispatch) => {
 export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const UPDATE_POST = 'UPDATE_POST'
+export const RECEIVE_POST = 'RECEIVE_POST'
 
 const __fetchPosts = (category = 'all') => (dispatch) => {
     let api = category === 'all' ? 'posts' : `${category}/posts`;
@@ -54,15 +55,41 @@ const __requestPost = (postId, params) => (dispatch) => {
         .then(json => dispatch(updatePost(json)))
 }
 
+const __createPost = (post) => (dispatch) => {
+    return fetch(`http://127.0.0.1:3001/posts`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': 'as-guest', 
+            'Content-Type' : 'application/json'
+         },
+        body: JSON.stringify(post)
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receivePost(json)))
+}
+
 export const receivePosts = (posts) => ({
     type: RECEIVE_POSTS,
     posts
+})
+
+export const receivePost = (post) => ({
+    type: RECEIVE_POST,
+    post
 })
 
 export const updatePost = (post) => ({
     type: UPDATE_POST,
     post
 })
+
+export const createPost = (post) => (dispatch) => {
+    return dispatch(__createPost({
+        ...post,
+        timestamp: +new Date(),
+        id: uuidCreator('post'),
+    }))
+}
 
 export const requestPosts = (category) => (dispatch) => {
     return dispatch(__fetchPosts(category))
@@ -104,11 +131,7 @@ const __createComment = (comment) => (dispatch) => {
             'Authorization': 'as-guest',
             'Content-Type' : 'application/json'
         },
-        body: JSON.stringify({
-            ...comment,
-            timestamp: +new Date(),
-            id: uuidCreator('comment'),
-        })
+        body: JSON.stringify(comment)
     })
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
@@ -137,7 +160,11 @@ const __updateComment = (commentId, params) => (dispatch) => {
         .then(json => dispatch(receiveComment(json)))
 }
 export const createComment = (comment) => (dispatch) => {
-    return dispatch(__createComment(comment))
+    return dispatch(__createComment({
+        ...comment,
+        timestamp: +new Date(),
+        id: uuidCreator('comment')
+    }))
 }
 export const deleteComment = (commentId) => (dispatch) => {
     return dispatch(__deleteComment(commentId))

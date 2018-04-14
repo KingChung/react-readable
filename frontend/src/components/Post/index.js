@@ -23,9 +23,6 @@ class Post extends Component {
         const userColor = strToHex(post.author)
         return (
             <div>
-                <Link to="/" >
-                    <Icon name='arrow left' /> back
-                </Link>
                 <Segment>
                     {post.id &&
                         <div>
@@ -61,6 +58,9 @@ class Post extends Component {
                         </div>
                     }
                 </Segment>
+                <Link to="/" >
+                    <Icon name='arrow left' /> back
+                </Link>
             </div>
         )
     }

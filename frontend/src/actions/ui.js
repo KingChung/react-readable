@@ -16,3 +16,10 @@ export const toggleCategoryListLoading = (isLoading) => ({
     type: FETCH_CATEGORY_LIST,
     isLoading
 })
+
+export const TOGGLE_COMMENTFORM = 'TOGGLE_COMMENTFORM'
+export const toggleCommentForm = (open, comment) => ({
+    type: TOGGLE_COMMENTFORM,
+    open,
+    comment
+})

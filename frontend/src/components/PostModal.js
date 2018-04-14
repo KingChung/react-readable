@@ -17,6 +17,8 @@ class PostModal extends Component {
             }
             this.authorInput.value = ''
             this.categoryInput.value = ''
+        } else {
+            output.id = this.props.postModal.post.id
         }
         
         output = {

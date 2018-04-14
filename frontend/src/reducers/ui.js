@@ -1,4 +1,4 @@
-import { SELECT_MENU, TOGGLE_POSTMODAL, FETCH_CATEGORY_LIST} from '../actions/ui'
+import { SELECT_MENU, TOGGLE_POSTMODAL, FETCH_CATEGORY_LIST, TOGGLE_COMMENTFORM } from '../actions/ui'
 
 const initGlobalMenu = {
     activeCategory: ''
@@ -12,10 +12,16 @@ const initCategoryList = {
     isLoading: false
 }
 
+const initCommentList = {
+    open: false,
+    editComment: null
+}
+
 const initUIState = {
-    postModal: {...initPostModal},
-    globalMenu: {...initGlobalMenu},
-    categoryList: {...initCategoryList}
+    postModal: { ...initPostModal },
+    globalMenu: { ...initGlobalMenu },
+    categoryList: { ...initCategoryList },
+    commentList: {...initCommentList}
 }
 export default (state = initUIState, action) => {
     switch (action.type) {
@@ -38,13 +44,23 @@ export default (state = initUIState, action) => {
                     post
                 },
             }
-        case FETCH_CATEGORY_LIST: 
+        case FETCH_CATEGORY_LIST:
             const { isLoading } = action
             return {
                 ...state,
                 categoryList: {
                     ...state.categoryList,
                     isLoading
+                },
+            }
+        case TOGGLE_COMMENTFORM:
+            const { comment } = action
+            return {
+                ...state,
+                commentList: {
+                    ...state.categoryList,
+                    open: action.open,
+                    comment
                 },
             }
         default:

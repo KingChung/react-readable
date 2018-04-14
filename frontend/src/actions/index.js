@@ -46,7 +46,7 @@ const __fetchPost = (id) => (dispatch) => {
 
 const __updatePost = (postId, params) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/posts/${postId}`, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 
             'Authorization': 'as-guest', 
             'Content-Type' : 'application/json'
@@ -56,8 +56,6 @@ const __updatePost = (postId, params) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receivePost(json)))
 }
-
-export const apiUpdatePost = __updatePost
 
 const __createPost = (post) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/posts`, {
@@ -159,7 +157,7 @@ const __deleteComment = (commentId) => (dispatch) => {
 
 const __updateComment = (commentId, params) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/comments/${commentId}`, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 
             'Authorization': 'as-guest',
             'Content-Type' : 'application/json'
@@ -169,7 +167,6 @@ const __updateComment = (commentId, params) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
 }
-export const apiUpdateComment = __updateComment
 
 export const receiveComments = (comments) => ({
     type: RECEIVE_COMMENTS,

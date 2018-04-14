@@ -2,7 +2,7 @@ import React from 'react'
 import { Feed, Icon } from 'semantic-ui-react'
 
 const VoteScore = (props) => (
-    <Feed.Like className={props.isLiked && 'active'} onClick={(e) => {
+    <Feed.Like className={props.isLiked ? 'active' : ''} onClick={(e) => {
         e.currentTarget.classList.toggle('active')
         props.handleVoteScore(e.currentTarget.classList.contains('active'))
     }}>

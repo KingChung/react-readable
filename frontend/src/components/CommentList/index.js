@@ -7,6 +7,7 @@ import { updateVote, SCORETYPE_COMMENT } from '../../actions/vote'
 import { hexToReverse, strToHex } from '../../utils/colorHelpers'
 import Moment from 'react-moment'
 import './index.css'
+import { toggleCommentForm } from '../../actions/ui';
 
 class CommentList extends Component {
     componentDidMount() {
@@ -33,8 +34,11 @@ class CommentList extends Component {
             type: SCORETYPE_COMMENT
         }, isLike))
     }
+    handleEditComment = (comment) => {
+        this.props.dispatch(toggleCommentForm(true, comment))
+    }
     render() {
-        const { comments } = this.props
+        const { comments, editComment } = this.props
         return (
             <Comment.Group threaded>
                 <Header as='h4' dividing>Comments</Header>
@@ -56,9 +60,10 @@ class CommentList extends Component {
                                     <VoteScore isLiked={comment.isLiked} score={comment.voteScore} handleVoteScore={(isLike) => {
                                         this.handleCommentLike(comment.id, isLike)
                                     }}/>
-                                    <Comment.Action className="trash" onClick={(e) => {
-                                        this.handleDeleteComment(comment.id)
-                                    }}>
+                                    <Comment.Action className="edit" onClick={this.handleEditComment.bind(this, comment)}>
+                                        <Icon name="edit" /> Edit
+                                    </Comment.Action>
+                                    <Comment.Action className="trash" onClick={this.handleDeleteComment.bind(this, comment.id)}>
                                         <Icon name="trash" /> Delete
                                     </Comment.Action>
                                 </Comment.Actions>
@@ -83,8 +88,9 @@ class CommentList extends Component {
     }
 }
 const mapStateToProps = (state) => {
-    const { comments, voteState } = state
+    const { comments, voteState, ui } = state
     return {
+        editComment: ui.commentList.comment,
         comments: Object.values(comments).map((comment) => ({
           ...comment,
           isLiked: voteState[SCORETYPE_COMMENT][comment.id]

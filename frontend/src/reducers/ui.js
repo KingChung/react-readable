@@ -58,7 +58,7 @@ export default (state = initUIState, action) => {
             return {
                 ...state,
                 commentList: {
-                    ...state.categoryList,
+                    ...state.commentList,
                     open: action.open,
                     comment
                 },

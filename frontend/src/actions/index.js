@@ -130,7 +130,6 @@ const __fetchComments = (postId) => (dispatch) => {
 }
 
 const __createComment = (comment) => (dispatch) => {
-    comment.parentId = comment.postId
     return fetch(`http://127.0.0.1:3001/comments`, {
         method: 'POST',
         headers: { 
@@ -166,6 +165,13 @@ const __updateComment = (commentId, params) => (dispatch) => {
     })
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
+}
+
+export const updateComment = (comment) => (dispatch) => {
+    return dispatch(__updateComment(comment.id, {
+        ...comment,
+        timestamp: + new Date()
+    }))
 }
 
 export const receiveComments = (comments) => ({

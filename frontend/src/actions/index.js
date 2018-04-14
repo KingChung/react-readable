@@ -1,5 +1,6 @@
 import uuidCreator from '../utils/uuidCreator'
 
+// Category
 export const REQUEST_CATEGORIES = 'REQUEST_CATEGORIES'
 export const RECEIVE_CATEGORIES = 'RECEIVE_CATEGORIES'
 
@@ -20,6 +21,7 @@ export const requestCategories = () => (dispatch) => {
     return dispatch(__fetchCategories())
 }
 
+// Post
 export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const UPDATE_POST = 'UPDATE_POST'
@@ -42,7 +44,7 @@ const __fetchPost = (id) => (dispatch) => {
         .then(json => dispatch(receivePosts([json])))
 }
 
-const __requestPost = (postId, params) => (dispatch) => {
+const __updatePost = (postId, params) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/posts/${postId}`, {
         method: 'POST',
         headers: { 
@@ -52,8 +54,10 @@ const __requestPost = (postId, params) => (dispatch) => {
         body: JSON.stringify(params)
     })
         .then(res => res.json())
-        .then(json => dispatch(updatePost(json)))
+        .then(json => dispatch(receivePost(json)))
 }
+
+export const apiUpdatePost = __updatePost
 
 const __createPost = (post) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/posts`, {
@@ -68,27 +72,15 @@ const __createPost = (post) => (dispatch) => {
         .then(json => dispatch(receivePost(json)))
 }
 
-export const receivePosts = (posts) => ({
-    type: RECEIVE_POSTS,
-    posts
-})
-
-export const receivePost = (post) => ({
-    type: RECEIVE_POST,
-    post
-})
-
-export const updatePost = (post) => ({
-    type: UPDATE_POST,
-    post
-})
-
-export const createPost = (post) => (dispatch) => {
-    return dispatch(__createPost({
-        ...post,
-        timestamp: +new Date(),
-        id: uuidCreator('post'),
-    }))
+const __deletePost = (postId) => (dispatch) => {
+    return fetch(`http://127.0.0.1:3001/posts/${postId}`, {
+        method: 'DELETE',
+        headers: { 
+            'Authorization': 'as-guest'
+        }
+    })
+        .then(res => res.json())
+        .then(json => dispatch(receivePost(json)))
 }
 
 export const requestPosts = (category) => (dispatch) => {
@@ -99,9 +91,36 @@ export const requestPost = (id) => (dispatch) => {
     return dispatch(__fetchPost(id))
 }
 
+export const receivePosts = (posts) => ({
+    type: RECEIVE_POSTS,
+    posts
+})
+
+export const receivePost = (post) => ({
+    type: RECEIVE_POST,
+    post
+})
+
+export const updatePost = (post) => (dispatch) => {
+    return dispatch(__updatePost(post.id, post))
+}
+
+export const deletePost = (postId) => (dispatch) => {
+    return dispatch(__deletePost(postId))
+}
+
+export const createPost = (post) => (dispatch) => {
+    return dispatch(__createPost({
+        ...post,
+        timestamp: +new Date(),
+        id: uuidCreator('post'),
+    }))
+}
+
+// Comment
 export const RECEIVE_COMMENTS = 'RECEIVE_COMMENTS'
 export const RECEIVE_COMMENT = 'RECEIVE_COMMENT'
-const __requestComments = (postId) => (dispatch) => {
+const __fetchComments = (postId) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/posts/${postId}/comments`, {
         method: 'GET',
         headers: { 
@@ -110,17 +129,6 @@ const __requestComments = (postId) => (dispatch) => {
     })
         .then(res => res.json())
         .then(json => dispatch(receiveComments(json)))
-}
-export const receiveComments = (comments) => ({
-    type: RECEIVE_COMMENTS,
-    comments
-})
-export const receiveComment = (comment) => ({
-    type: RECEIVE_COMMENT,
-    comment
-})
-export const requestComments = (postId) => (dispatch) => {
-    return dispatch(__requestComments(postId))
 }
 
 const __createComment = (comment) => (dispatch) => {
@@ -136,6 +144,7 @@ const __createComment = (comment) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
 }
+
 const __deleteComment = (commentId) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/comments/${commentId}`, {
         method: 'DELETE',
@@ -147,6 +156,7 @@ const __deleteComment = (commentId) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
 }
+
 const __updateComment = (commentId, params) => (dispatch) => {
     return fetch(`http://127.0.0.1:3001/comments/${commentId}`, {
         method: 'POST',
@@ -159,6 +169,20 @@ const __updateComment = (commentId, params) => (dispatch) => {
         .then(res => res.json())
         .then(json => dispatch(receiveComment(json)))
 }
+export const apiUpdateComment = __updateComment
+
+export const receiveComments = (comments) => ({
+    type: RECEIVE_COMMENTS,
+    comments
+})
+export const receiveComment = (comment) => ({
+    type: RECEIVE_COMMENT,
+    comment
+})
+export const requestComments = (postId) => (dispatch) => {
+    return dispatch(__fetchComments(postId))
+}
+
 export const createComment = (comment) => (dispatch) => {
     return dispatch(__createComment({
         ...comment,
@@ -169,42 +193,3 @@ export const createComment = (comment) => (dispatch) => {
 export const deleteComment = (commentId) => (dispatch) => {
     return dispatch(__deleteComment(commentId))
 }
-
-
-//Vote Score
-const VOTE_LIKE = 'upVote'
-const VOTE_UNLIKE = 'downVote'
-export const SCORETYPE_POST = 'post'
-export const SCORETYPE_COMMENT = 'comment'
-
-export const votePost = (postId, isLike) => (dispatch) => {
-    dispatch(updateScoreState(SCORETYPE_POST, postId, isLike))
-    return dispatch(__requestPost(postId, {
-        option:isLike ? VOTE_LIKE : VOTE_UNLIKE
-    }))
-}
-
-export const voteComment = (commentId, isLike) => (dispatch) => {
-    dispatch(updateScoreState(SCORETYPE_COMMENT, commentId, isLike))
-    return dispatch(__updateComment(commentId, {
-        option:isLike ? VOTE_LIKE : VOTE_UNLIKE
-    }))
-}
-
-export const UPDATE_SCORE_STATE = 'UPDATE_SCORE_STATE'
-export const updateScoreState = (scoreType, id, scoreState) => ({
-    type: UPDATE_SCORE_STATE,
-    id,
-    scoreState,
-    scoreType
-})
-
-// UI State
-export const SELECT_MENU = 'SELECT_MENU'
-export const selectMenu = (item) => ({
-    type: SELECT_MENU,
-    activeItem: item
-})
-
-
-

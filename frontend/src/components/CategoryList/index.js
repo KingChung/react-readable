@@ -3,7 +3,9 @@ import { Segment, Feed, Label, Icon } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux';
 import GlobalMenu from '../../components/GlobalMenu';
-import { requestPosts, votePost, SCORETYPE_COMMENT } from '../../actions';
+import { requestPosts, deletePost } from '../../actions';
+import { togglePostModal, toggleCategoryListLoading } from '../../actions/ui';
+import { updateVote, SCORETYPE_POST } from '../../actions/vote';
 import './index.css';
 import VoteScore from '../../components/VoteScore';
 import Moment from 'react-moment'
@@ -11,10 +13,6 @@ import 'moment-timezone'
 import { hexToReverse, strToHex } from '../../utils/colorHelpers';
 
 class CategoryList extends Component {
-  state = {
-    isLoading: false,
-    isEmpty: true
-  }
   componentDidMount() {
     this.handleFetchPost(this.props.category)
   }
@@ -24,16 +22,17 @@ class CategoryList extends Component {
     }
   }
   handleFetchPost(category) {
-    this.setState({isLoading: true})
-    this.props.dispatch(requestPosts(category)).then(() => {
-      this.setState({
-        isLoading: false,
-        isEmpty: !this.props.posts.length
-      })
+    const { dispatch } = this.props
+    dispatch(toggleCategoryListLoading(true))
+    dispatch(requestPosts(category)).then(() => {
+      dispatch(toggleCategoryListLoading(false))
     })
   }
   handlePostLike = (postId, isLike) => {
-    this.props.dispatch(votePost(postId, isLike))
+    this.props.dispatch(updateVote({
+      id: postId,
+      type: SCORETYPE_POST
+    }, isLike))
   }
   handleSorter = (e) => {
     const criteria = e.target.value
@@ -47,18 +46,23 @@ class CategoryList extends Component {
       })
     })
   }
+  handleOpenModal = (post) => {
+    this.props.dispatch(togglePostModal(true, post))
+  }
+  handleDeletePost = (postId) => {
+    this.props.dispatch(deletePost(postId))
+  }
   render() {
-    const { isLoading, isEmpty } = this.state
-    const { category } = this.props
+    const { category, posts, isLoading } = this.props
     return (
         <div>
-          <GlobalMenu activeItem={category} />
+          <GlobalMenu activeCategory={category} />
           <Segment loading={isLoading ? true : false}>
-              {isEmpty
+              {!posts.length
               ? <div>No Feeds.</div>
               : <Feed>
               {
-                  this.props.posts.map((post, i) => {
+                  posts.map((post, i) => {
                       const userColor = strToHex(post.author)
                       return (
                           <Feed.Event key={i} as="">
@@ -85,13 +89,21 @@ class CategoryList extends Component {
                                           </Link>
                                           {post.commentCount} Comments
                                       </Feed.Like>
+                                      <Feed.Like as='span' onClick={this.handleOpenModal.bind(this, post)}>
+                                          <Icon name='edit' color="blue" /> Edit
+                                      </Feed.Like>
+                                      <Feed.Like as='span' onClick={() => {
+                                        this.handleDeletePost(post.id)
+                                      }}>
+                                          <Icon name='trash' color="grey" /> Delete
+                                      </Feed.Like>
                                   </Feed.Meta>
                               </Feed.Content>
                           </Feed.Event>
                       )
                   })
               }
-          </Feed>
+              </Feed>
               }
           </Segment>
         </div>
@@ -100,11 +112,12 @@ class CategoryList extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { posts, scoreState } = state
+    const { posts, voteState, ui } = state
     return {
+        isLoading: ui.categoryList.isLoading,
         posts: Object.values(posts).map((post) => ({
           ...post,
-          isLiked: scoreState[SCORETYPE_COMMENT][post.id]
+          isLiked: voteState[SCORETYPE_POST][post.id]
         }))
     }
 }

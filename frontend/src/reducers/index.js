@@ -1,22 +1,9 @@
 import { combineReducers } from 'redux'
-import { RECEIVE_CATEGORIES, SELECT_MENU, RECEIVE_POSTS, UPDATE_POST, UPDATE_SCORE_STATE, RECEIVE_COMMENTS, RECEIVE_COMMENT, SCORETYPE_POST, SCORETYPE_COMMENT, RECEIVE_POST } from '../actions';
+import { RECEIVE_CATEGORIES, RECEIVE_POSTS, UPDATE_POST, RECEIVE_COMMENTS, RECEIVE_COMMENT, RECEIVE_POST } from '../actions'
+import ui from './ui'
+import voteState from './vote'
 
-const initMenu = {
-    activeItem: ''
-}
-const globalMenu = (state = initMenu, action) => {
-    switch(action.type) {
-        case SELECT_MENU:
-            const { activeItem } = action
-            return {
-                ...state,
-                activeItem
-            }
-        default:
-            return state
-    }
-}
-
+// Data Struct
 const categories = (state = [], action) => {
     switch(action.type) {
         case RECEIVE_CATEGORIES: 
@@ -94,29 +81,10 @@ const comments = (state = {}, action) => {
     }
 }
 
-const initScoreState = {
-    [SCORETYPE_POST]: {},
-    [SCORETYPE_COMMENT]: {}
-}
-const scoreState = (state = initScoreState, action) => {
-    switch (action.type) {
-        case UPDATE_SCORE_STATE:
-            return {
-                ...state,
-                [action.scoreType]: {
-                    ...state[action.scoreType],
-                    [action.id]: action.scoreState
-                }
-            }
-        default:
-            return state
-    }
-}
-
 export default combineReducers({
+    ui,
     posts,
     categories,
     comments,
-    globalMenu,
-    scoreState
+    voteState
 })

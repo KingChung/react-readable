@@ -5,7 +5,8 @@ import { Segment, Feed, Icon, Label, Header } from 'semantic-ui-react'
 import VoteScore from '../VoteScore'
 import Moment from 'react-moment'
 import { hexToReverse, strToHex } from '../../utils/colorHelpers';
-import { requestPost, votePost } from '../../actions';
+import { requestPost } from '../../actions';
+import { updateVote, SCORETYPE_POST } from '../../actions/vote';
 import { Link } from 'react-router-dom'
 import CommentList from '../CommentList/index';
 
@@ -15,14 +16,20 @@ class Post extends Component {
         this.props.dispatch(requestPost(this.props.postId))
     }
     handlePostLike = (postId, isLike) => {
-        this.props.dispatch(votePost(postId, isLike))
+        this.props.dispatch(updateVote({
+            type: SCORETYPE_POST,
+            id: postId
+        }, isLike))
     }
     render() {
-        const { postId, posts, scoreState } = this.props
+        const { postId, posts, voteState } = this.props
         const post = posts[postId] || {}
         const userColor = strToHex(post.author)
         return (
             <div>
+                <Link to="/" style={{marginTop: 15, display: 'block'}}>
+                    <Icon name='arrow left' /> back
+                </Link>
                 <Segment>
                     {post.id &&
                         <div>
@@ -43,7 +50,7 @@ class Post extends Component {
                                             {post.body}
                                         </Feed.Extra>
                                         <Feed.Meta>
-                                            <VoteScore isLiked={scoreState[post.id]} score={post.voteScore} handleVoteScore={(isLike) => {
+                                            <VoteScore isLiked={voteState[SCORETYPE_POST][post.id]} score={post.voteScore} handleVoteScore={(isLike) => {
                                                 this.handlePostLike(post.id, isLike)
                                             }} />
                                             <Feed.Like as='span'>
@@ -58,18 +65,15 @@ class Post extends Component {
                         </div>
                     }
                 </Segment>
-                <Link to="/" >
-                    <Icon name='arrow left' /> back
-                </Link>
             </div>
         )
     }
 }
 
 const mapStateToProps = (state) => {
-    const { posts, scoreState, comments } = state
+    const { posts, voteState, comments } = state
     return {
-        scoreState,
+        voteState,
         posts: Object.values(posts).reduce((posts, post) => {
             posts[post.id] = {
                 ...post,

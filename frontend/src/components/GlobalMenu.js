@@ -1,88 +1,38 @@
 import React, { Component } from 'react'
-import { Menu, Icon, Modal, Form, Select, Button, Input } from 'semantic-ui-react'
+import { Menu, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { selectMenu, requestCategories, createPost } from '../actions';
+import { requestCategories } from '../actions';
+import { selectMenu, togglePostModal } from '../actions/ui'
 import { withRouter } from 'react-router-dom';
+import PostModal from './PostModal';
 
 class GlobalMenu extends Component {
-  state = {
-    open: false
-  }
   componentDidMount() {
-    this.props.dispatch(requestCategories())
-    this.selectMenu(this.props.activeItem)
-    this.setState({
-      newPostCategory: this.props.activeItem
+    this.props.dispatch(requestCategories()).then(() => {
+      this.props.dispatch(selectMenu(this.props.activeCategory))
     })
   }
   handleItemClick = (e, { name, path }) => {
-    this.selectMenu(name)
     this.props.history.push(path)
   }
-  selectMenu(name) {
-    this.props.dispatch(selectMenu(name))
-  }
-  handleAddPost = () => {
-    let title = this.titleInput.value,
-      body = this.bodyInput.value,
-      author = this.authorInput.value,
-      category = this.categoryInput.value
-    this.props.dispatch(createPost({
-      title,
-      body,
-      author,
-      category
-    }))
-    this.setState({open: false})
-  }
-  handleOpenModal = () => {
-    this.setState({open: true})
+  handleOpenModal = (openOrNot, e) => {
+    e.preventDefault()
+    this.props.dispatch(togglePostModal(openOrNot))
   }
   render() {
-    const { activeItem } = this.props.globalMenu
+    const { activeCategory } = this.props
     return (
       <div>
         <Menu pointing secondary>
           {
             this.props.menuItems.map((item, index) => (
-              <Menu.Item key={index} name={item.name} path={'/' + item.path} active={activeItem === item.name} onClick={this.handleItemClick} />
+              <Menu.Item key={index} name={item.name} path={'/' + item.path} active={activeCategory === item.name} onClick={this.handleItemClick} />
             ))
           }
-          <Menu.Item position="right" onClick={this.handleOpenModal}>
+          <Menu.Item position="right" onClick={this.handleOpenModal.bind(this, true)}>
             <Icon name="plus" /> Add Post
           </Menu.Item>
-          <Modal open={this.state.open} dimmer="blurring" style={{ margin: '0 auto', marginTop: 0 }}>
-            <Modal.Header>Add a Post</Modal.Header>
-            <Modal.Content>
-              <Form onSubmit={this.handleAddPost}>
-                <div className="field">
-                  <div className="ui input">
-                    <input placeholder="Your Name" type="text" ref={input => this.authorInput = input} />
-                  </div>
-                </div>
-                <div className="field">
-                  <div className="ui input">
-                    <select ref={input => this.categoryInput = input} placeholder='Select Post Category' defaultValue={activeItem}>
-                      {
-                        this.props.postOptions.map((po) => (
-                          <option key={po.key} value={po.value}>{po.text}</option>
-                        ))
-                      }
-                    </select>
-                  </div>
-                </div>
-                <div className="field">
-                  <div className="ui input">
-                    <input placeholder="Title" type="text" ref={input => this.titleInput = input} />
-                  </div>
-                </div>
-                <div className="field">
-                  <textarea placeholder="Comment" ref={input => this.bodyInput = input}></textarea>
-                </div>
-                <Button content='Submit' labelPosition='left' icon='edit' primary />
-              </Form>
-            </Modal.Content>
-          </Modal>
+          <PostModal activeCategory={this.props.activeCategory} />
         </Menu>
       </div>
     )
@@ -90,17 +40,11 @@ class GlobalMenu extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { globalMenu, categories } = state
+  const { categories } = state
   return {
-    globalMenu,
     menuItems: [{ name: 'all', path: '' }].concat(categories.map((cate) => {
       const { name } = cate
       return { name, path: name }
-    })),
-    postOptions: categories.map((cate, i) => ({
-      key: i,
-      text: cate.name,
-      value: cate.name,
     }))
   }
 }

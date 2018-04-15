@@ -23,3 +23,9 @@ export const toggleCommentForm = (open, comment) => ({
     open,
     comment
 })
+
+export const SELECT_SORTER = 'SELECT_SORTER'
+export const selectSorter = (condition) => ({
+    type: SELECT_SORTER,
+    condition
+})

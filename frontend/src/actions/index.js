@@ -26,6 +26,7 @@ export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const UPDATE_POST = 'UPDATE_POST'
 export const RECEIVE_POST = 'RECEIVE_POST'
+export const SORT_POSTS = 'SORT_POSTS'
 
 const __fetchPosts = (category = 'all') => (dispatch) => {
     let api = category === 'all' ? 'posts' : `${category}/posts`;
@@ -114,6 +115,11 @@ export const createPost = (post) => (dispatch) => {
         id: uuidCreator('post'),
     }))
 }
+
+export const sortPosts = (criteria) => ({
+    type: SORT_POSTS,
+    criteria
+})
 
 // Comment
 export const RECEIVE_COMMENTS = 'RECEIVE_COMMENTS'

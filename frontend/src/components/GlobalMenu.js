@@ -1,16 +1,21 @@
 import React, { Component } from 'react'
-import { Menu, Icon } from 'semantic-ui-react'
+import { Menu, Icon, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { requestCategories } from '../actions';
-import { selectMenu, togglePostModal } from '../actions/ui'
+import { requestCategories, sortPosts } from '../actions';
+import { selectMenu, togglePostModal, selectSorter } from '../actions/ui'
 import { withRouter } from 'react-router-dom';
-import PostModal from './PostModal';
 
 class GlobalMenu extends Component {
   componentDidMount() {
-    this.props.dispatch(requestCategories()).then(() => {
-      this.props.dispatch(selectMenu(this.props.activeCategory))
+    const { dispatch } = this.props
+    dispatch(requestCategories()).then(() => {
+      dispatch(selectMenu(this.props.activeCategory))
     })
+  }
+  componentWillReceiveProps(nextProps) {
+    if(this.props.activeCategory !== nextProps.activeCategory) {
+      this.props.dispatch(selectSorter(''))
+    }
   }
   handleItemClick = (e, { name, path }) => {
     this.props.history.push(path)
@@ -19,8 +24,12 @@ class GlobalMenu extends Component {
     e.preventDefault()
     this.props.dispatch(togglePostModal(openOrNot))
   }
+  handleSorter = (e, data) => {
+    this.props.dispatch(selectSorter(data.value))
+    this.props.dispatch(sortPosts(data.value))
+  }
   render() {
-    const { activeCategory } = this.props
+    const { activeCategory, condition } = this.props
     return (
       <div>
         <Menu pointing secondary>
@@ -29,10 +38,17 @@ class GlobalMenu extends Component {
               <Menu.Item key={index} name={item.name} path={'/' + item.path} active={activeCategory === item.name} onClick={this.handleItemClick} />
             ))
           }
-          <Menu.Item position="right" onClick={this.handleOpenModal.bind(this, true)}>
-            <Icon name="plus" /> Add Post
-          </Menu.Item>
-          <PostModal activeCategory={this.props.activeCategory} />
+          <Menu.Menu position="right">
+            <Dropdown item text={`Sort by: ${condition}`} icon="sort">
+              <Dropdown.Menu>
+                <Dropdown.Item value="timestamp" onClick={this.handleSorter}><Icon name="time" color="green" />timestamp</Dropdown.Item>
+                <Dropdown.Item value="voteScore" onClick={this.handleSorter}><Icon name="like" color="red" />voteScore</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <Menu.Item onClick={this.handleOpenModal.bind(this, true)}>
+              <Icon name="plus" /> Add Post
+            </Menu.Item>
+          </Menu.Menu>
         </Menu>
       </div>
     )
@@ -40,8 +56,9 @@ class GlobalMenu extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { categories } = state
+  const { categories, ui } = state
   return {
+    condition: ui.globalMenu.condition || '',
     menuItems: [{ name: 'all', path: '' }].concat(categories.map((cate) => {
       const { name } = cate
       return { name, path: name }

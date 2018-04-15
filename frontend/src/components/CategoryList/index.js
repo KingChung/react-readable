@@ -7,7 +7,8 @@ import { requestPosts, deletePost } from '../../actions';
 import { togglePostModal, toggleCategoryListLoading } from '../../actions/ui';
 import { updateVote, SCORETYPE_POST } from '../../actions/vote';
 import './index.css';
-import VoteScore from '../../components/VoteScore';
+import VoteScore from '../../components/VoteScore'
+import PostModal from '../../components/PostModal'
 import Moment from 'react-moment'
 import 'moment-timezone'
 import { hexToReverse, strToHex } from '../../utils/colorHelpers';
@@ -34,18 +35,6 @@ class CategoryList extends Component {
       type: SCORETYPE_POST
     }, isLike))
   }
-  handleSorter = (e) => {
-    const criteria = e.target.value
-    const { posts } = this.state
-    this.setState({
-      posts: posts.sort((a, b) => {
-        if(a[criteria] && b[criteria]) {
-            return a[criteria] - b[criteria]
-        }
-        return 0
-      })
-    })
-  }
   handleOpenModal = (post) => {
     this.props.dispatch(togglePostModal(true, post))
   }
@@ -57,6 +46,7 @@ class CategoryList extends Component {
     return (
         <div>
           <GlobalMenu activeCategory={category} />
+          <PostModal activeCategory={this.props.activeCategory} />
           <Segment loading={isLoading ? true : false}>
               {!posts.length
               ? <div>No Feeds.</div>

@@ -47,7 +47,7 @@ class PostModal extends Component {
         const isEditMode = post.id
         return (
             <Modal dimmer="blurring" style={{ margin: '0 auto', marginTop: 0 }} open={this.props.postModal.open}>
-                <Modal.Header>Add a Post</Modal.Header>
+                <Modal.Header>{isEditMode ? 'Edit' : 'Add'} a Post</Modal.Header>
                 <Modal.Content>
                     <Form onSubmit={this.handleSubmitModal.bind(this)}>
                         {!isEditMode && <div className="field">

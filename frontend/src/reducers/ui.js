@@ -1,4 +1,4 @@
-import { SELECT_MENU, TOGGLE_POSTMODAL, FETCH_CATEGORY_LIST, TOGGLE_COMMENTFORM } from '../actions/ui'
+import { SELECT_MENU, TOGGLE_POSTMODAL, FETCH_CATEGORY_LIST, TOGGLE_COMMENTFORM, SELECT_SORTER } from '../actions/ui'
 
 const initGlobalMenu = {
     activeCategory: ''
@@ -25,6 +25,15 @@ const initUIState = {
 }
 export default (state = initUIState, action) => {
     switch (action.type) {
+        case SELECT_SORTER: 
+            const { condition } = action
+            return {
+                ...state,
+                globalMenu: {
+                    ...state.globalMenu,
+                    condition
+                }
+            }
         case SELECT_MENU:
             const { activeCategory } = action
             return {

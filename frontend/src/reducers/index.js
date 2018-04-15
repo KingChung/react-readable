@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { RECEIVE_CATEGORIES, RECEIVE_POSTS, UPDATE_POST, RECEIVE_COMMENTS, RECEIVE_COMMENT, RECEIVE_POST } from '../actions'
+import { RECEIVE_CATEGORIES, RECEIVE_POSTS, UPDATE_POST, RECEIVE_COMMENTS, RECEIVE_COMMENT, RECEIVE_POST, SORT_POSTS } from '../actions'
 import ui from './ui'
 import voteState from './vote'
 
@@ -45,6 +45,15 @@ const posts = (state = {}, action) => {
                     }
                 }
             }
+        case SORT_POSTS:
+            const { criteria  } = action
+            const compare = typeof criteria === 'function' ? criteria : (a, b) => {
+                return a[criteria] - b[criteria]
+            }
+            return Object.values(state).sort(compare).reduce((posts, post, index) => {
+                posts[post.id] = post
+                return posts
+            }, {})
         default:
             return state
     }
